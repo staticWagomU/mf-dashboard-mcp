@@ -3,7 +3,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
-import { normalizeReadOnlySql, runReadOnlyQuery } from "./query-sandbox.js";
+import {
+  createReadOnlyDatabaseUri,
+  normalizeReadOnlySql,
+  runReadOnlyQuery,
+} from "./query-sandbox.js";
 
 describe("read-only query sandbox", () => {
   let directory: string;
@@ -87,6 +91,14 @@ describe("read-only query sandbox", () => {
     expect(database.prepare("SELECT amount FROM transactions WHERE id = 1").get()).toEqual({
       amount: 500,
     });
+    database.close();
+  });
+
+  test("opens the attached source database in SQLite read-only mode", () => {
+    const database = new DatabaseSync(":memory:");
+    database.prepare("ATTACH DATABASE ? AS source").run(createReadOnlyDatabaseUri(databasePath));
+
+    expect(() => database.exec("UPDATE source.transactions SET amount = 0")).toThrow(/readonly/i);
     database.close();
   });
 });

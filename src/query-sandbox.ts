@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { pathToFileURL } from "node:url";
 import { transactionHasFirstSeenAt } from "./database.js";
 
 export const QUERY_MAX_ROWS = 200;
@@ -114,12 +115,16 @@ function quoteSqlText(value: string): string {
   return `'${value.replaceAll("'", "''")}'`;
 }
 
+export function createReadOnlyDatabaseUri(databasePath: string): string {
+  return `${pathToFileURL(databasePath).href}?mode=ro`;
+}
+
 function createScopedDatabaseSql(
   databasePath: string,
   groupId: string,
   hasFirstSeenAt: boolean,
 ): string {
-  const sourceDatabase = quoteSqlText(databasePath);
+  const sourceDatabase = quoteSqlText(createReadOnlyDatabaseUri(databasePath));
   const selectedGroup = quoteSqlText(groupId);
   const globalSnapshotGroup = quoteSqlText("0");
   const firstSeenAt = hasFirstSeenAt ? "first_seen_at" : "NULL AS first_seen_at";
