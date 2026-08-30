@@ -18,12 +18,12 @@ Money Forwardや1Passwordの認証情報を渡さず、明細・口座・保有�
 ## 必要環境
 
 - LinuxまたはmacOS
-- Node.js 22.13.0以上
+- Node.js 24.13.0以上
 - pnpm 11.24.0以上
 - setup済みの[hiroppy/mf-dashboard](https://github.com/hiroppy/mf-dashboard)
 - mf-dashboardが生成した`data/moneyforward.db`
 
-`node:sqlite`を利用するため、Node.js 22.13.0未満では動作しません。
+元databaseをSQLite read-only URIでattachするため、Node.js 24.13.0未満では動作しません。
 
 ## Install
 
